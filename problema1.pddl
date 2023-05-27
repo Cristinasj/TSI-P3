@@ -1,27 +1,20 @@
 (define (problem GenerarMinerales)
     (:domain StarCraft)
     (:objects
-        vce1 vce2 vce3 - unidad
-        centro barracon - edificio
+        vce1 - unidad
+        centro1 barracon - edificio
         c1_1 c1_2 c1_3 c1_4 c1_5 c2_1 c2_2 c2_3 c2_4 c3_1 c3_2 c3_3 c3_4 c4_2 c4_3 c4_4 - localizacion
     )
     (:init
         (esTipoUnidad vce1 VCE)
-        (esTipoUnidad vce2 VCE)
-        (esTipoUnidad vce3 VCE)
-        (esTipoEdificio centro CentroDeMando)
+        (esTipoEdificio centro1 CentroDeMando)
         (esTipoEdificio barracon Barracones)
         (necesita CentroDeMando Gas)
         (necesita Barracones Minerales)
-        (en centro c3_3)
-        (en Minerales c1_1)
-        (en Minerales c1_2)
-        (en Minerales c1_3)
-        (en Gas c5_1)
-        (en Gas c5_2)
-        (en vce1 c2_2)
-        (en vce2 c2_3)
-        (en vce3 c2_4)
+        (en centro1 c1_1)
+        (en Minerales c2_4)
+        (en Minerales c4_4)
+        (en vce1 c1_1)
         (camino c1_1 c2_1)
         (camino c1_1 c1_2)
         (camino c1_2 c2_2)
@@ -58,7 +51,7 @@
     )
     (:goal
         (and
-            (en barracon c4_1)
+            (extrae vce1 Minerales)
         )
     )
 )
