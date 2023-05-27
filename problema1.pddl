@@ -1,3 +1,5 @@
+; Alumna: Cristina Sánchez Justicia 
+; Práctica 3 TSI 
 (define (problem GenerarMinerales)
     (:domain StarCraft)
     (:objects

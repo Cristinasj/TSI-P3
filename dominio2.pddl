@@ -1,3 +1,6 @@
+; Alumna: Cristina Sánchez Justicia 
+; Práctica 3 TSI 
+
 (define (domain StarCraft)
    ; Para hacer lógica más avanzada 
    (:requirements :adl )
