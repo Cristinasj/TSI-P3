@@ -1,22 +1,21 @@
-(define (problem GenerarMinerales)
+(define (problem GenerarGas)
     (:domain StarCraft)
     (:objects
-        ; Este problema solo utiliza un VCE 
-        vce1 - unidad
-        centro1  - edificio
-        ; Se definen los nodos del grafo que representa el mundo 
+        vce1 vce2 - unidad
+        centro1 extractor - edificio
         c1_1 c1_2 c1_3 c1_4 c1_5 c2_1 c2_2 c2_3 c2_4 c3_1 c3_2 c3_3 c3_4 c4_2 c4_3 c4_4 - localizacion
     )
     (:init
-        ; Se definen los tipos de los elementos que van a ser utilizados durante el problema 
         (esTipoUnidad vce1 VCE)
+        (esTipoEdificio extractor Extractor)
         (esTipoEdificio centro1 CentroDeMando)
-        ; Se posicionan los elementos que van a ser utilizados durante el problema 
         (en centro1 c1_1)
         (en Minerales c2_4)
         (en Minerales c4_4)
+        (en Gas c1_5)
         (en vce1 c1_1)
-        ; Se definen las aristas que unen los nodos del grafo que representa el mundo 
+        (en vce2 c1_1)
+        (necesita Extractor Minerales)
         (camino c1_1 c2_1)
         (camino c1_1 c1_2)
         (camino c1_2 c2_2)
@@ -53,7 +52,7 @@
     )
     (:goal
         (and
-            (ha_extraido Minerales)
+            (ha_extraido Gas)
         )
     )
 )
