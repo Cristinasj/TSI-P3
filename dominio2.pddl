@@ -1,8 +1,8 @@
-(define (domain p3dom)
-   (:requirements :adl)
+(define (domain StarCraft)
+   (:requirements :adl )
    (:types
-       posicionable localizacion - object
-       unidad edificio tipoUnidad tipoEdificio tipoRecurso - posicionable
+      posicionable localizacion - object
+      unidad edificio tipoUnidad tipoEdificio tipoRecurso - posicionable
    )
    (:constants 
       CentroDeMando Barracones Extractor - tipoEdificio
@@ -10,69 +10,70 @@
       Minerales Gas - tipoRecurso
    )
    (:predicates
+      (asignado ?u - unidad)
       (en ?p - posicionable ?x - localizacion)
       (camino ?x - localizacion ?y - localizacion)
-      (extrae ?u - unidad ?tr - tipoRecurso)
+      (ha_extraido ?tr - tipoRecurso)
       (esTipoEdificio ?e - edificio ?t - tipoEdificio)
       (esTipoUnidad ?u - unidad ?t - tipoUnidad)
       (necesita ?te - tipoEdificio ?tr - tipoRecurso)
    )
 
    (:action Navegar
-      :parameters (?u - unidad ?x ?y - localizacion)
-      :precondition
-         (and
-            (camino ?x ?y)
-            (en ?u ?x)
-         )
-      :effect
-         (and
-            (en ?u ?y)
-            (not (en ?u ?x))
-         )
+   :parameters (?u - unidad ?x ?y - localizacion)
+   :precondition
+      (and
+         (camino ?x ?y)
+         (en ?u ?x)
+      )
+   :effect
+      (and
+         (en ?u ?y)
+         (not (en ?u ?x))
+      )
    )
 
    (:action Asignar
-   :parameters (?u - unidad ?tr - tipoRecurso ?x - localizacion)
+   :parameters (?u - unidad ?l - localizacion ?tr - tipoRecurso)
    :precondition
       (and
-         (en ?u ?x)
-         (en ?tr ?x)
-         (or
-            (exists (?e - edificio)
-               (and 
-                  (en ?e ?x)
-                  (esTipoEdificio ?e Extractor)
+         (not (asignado ?u))
+         (en ?u ?l)
+         (en ?tr ?l)
+         (imply
+            (en Gas ?l)
+            (exists
+               (?e - Edificio)
+               (and (en ?e ?l) (esTipoEdificio ?e Extractor)
                )
             )
-            (not (en Gas ?x))
          )
       )
    :effect
       (and
-         (extrae ?u ?tr)
+         (ha_extraido ?tr)
+         (asignado ?u)
       )
    )
 
    (:action Construir
-      :parameters (?u - unidad ?e - edificio ?te - tipoEdificio ?x - localizacion)
-      :precondition
-         (and
-            (forall (?tr - tipoRecurso)
-               (not (extrae ?u ?tr))
+   ; recurso: mineral con el que se construye
+   :parameters (?u - unidad ?e - edificio ?l - localizacion ?tr - tipoRecurso)
+   :precondition 
+      (and 
+         (en ?u ?l)
+         (ha_extraido ?tr)
+         (exists (?te - tipoEdificio)
+            (and 
+               (necesita ?te ?tr)
+               (esTipoEdificio ?e ?te)
             )
-            (exists (?u1 - unidad ?tr - tipoRecurso)
-               (and 
-                  (extrae ?u1 ?tr)
-                  (necesita ?te ?tr)
-               )
-            )
-            (en ?u ?x)
-            (esTipoEdificio ?e ?te)
          )
-      :effect
-         (and
-            (en ?e ?x)
-         )
+      )   
+   :effect 
+      (and 
+         (en ?e ?l)
+      )
    )
+
 )

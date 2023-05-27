@@ -2,15 +2,12 @@
     (:domain StarCraft)
     (:objects
         vce1 - unidad
-        centro1 barracon - edificio
+        centro1  - edificio
         c1_1 c1_2 c1_3 c1_4 c1_5 c2_1 c2_2 c2_3 c2_4 c3_1 c3_2 c3_3 c3_4 c4_2 c4_3 c4_4 - localizacion
     )
     (:init
         (esTipoUnidad vce1 VCE)
         (esTipoEdificio centro1 CentroDeMando)
-        (esTipoEdificio barracon Barracones)
-        (necesita CentroDeMando Gas)
-        (necesita Barracones Minerales)
         (en centro1 c1_1)
         (en Minerales c2_4)
         (en Minerales c4_4)
@@ -51,7 +48,7 @@
     )
     (:goal
         (and
-            (extrae vce1 Minerales)
+            (ha_extraido Minerales)
         )
     )
 )
