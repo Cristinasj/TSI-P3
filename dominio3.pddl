@@ -20,19 +20,28 @@
    (:predicates
       ; Indica si una unidad está asignada a un nodo con recursos 
       (asignado ?u - unidad)
+      
       ; Indica la posición de los objetos en el mundo 
       (en ?p - posicionable ?x - localizacion)
+      
       ; Indica la conexión entre dos nodos 
       (camino ?x - localizacion ?y - localizacion)
+      
       ; Se ha extraído un recurso. Una vez que se extraen se tienen 
       ; recursos infinitos durante toda la partida 
       (ha_extraido ?tr - tipoRecurso)
+      
       ; Indica el tipo de edificio 
       (esTipoEdificio ?e - edificio ?t - tipoEdificio)
+      
       ; Indica el tipo de la unidad 
       (esTipoUnidad ?u - unidad ?t - tipoUnidad)
+      
       ; Indica los requisitos para construir un edificio 
       (necesita ?te - tipoEdificio ?tr - tipoRecurso)
+
+      ; Indica que el edificio ha sido construido 
+      (edificioConstruido ?e - edificio)
    )
 
    ; Cambia una unidad a otra posición si hay una unión para llegar 
@@ -100,28 +109,55 @@
    ; edificio: Edificio que se quiere construir
    ; localización: dónde se quiere construir. La unidad tiene que
    ; estar situada ahí  
-   ; recurso: material con el que se construye
-   :parameters (?u - unidad ?e - edificio ?l - localizacion ?tr - tipoRecurso)
+   ; Los materiales con los que se construye no se pasan por 
+   ; parámetro sino que se buscan dentro de la acción
+   :parameters (?u - unidad ?e - edificio ?l - localizacion)
    :precondition 
       (and 
-         ; La unidad tiene que estar en la localización 
+         ; La unidad tiene que estar en la localización
+         ; La unidad no puede estar asignada  
          (en ?u ?l)
-         ; Se tienen que tener los recursos correspondientes 
-         (ha_extraido ?tr)
-         ; Se buscan los materiales que necesita ese tipo de 
-         ; edificio 
-         (exists (?te - tipoEdificio)
+         (not (asignado ?u))
+         ; Se debe evitar que se construya más de un edificio en la 
+         ; misma localización
+         (not (en ?e ?l))         
+         (not (edificioConstruido ?e))
+         (forall (?e - edificio)
             (and 
-               (necesita ?te ?tr)
-               (esTipoEdificio ?e ?te)
+               (not (en ?e ?l))
             )
          )
-      )   
+         ; El extractor tiene que estar en un nodo con gas vespeno
+         (imply (esTipoEdificio ?e extractor)
+            (and (en Gas ?l))
+         )
+         ; Se tienen que tener los recursos correspondientes
+         ; Existe un tipo de edificio tal que el edificio es de ese 
+         ; tipo y para todos los recursos si los necesita, los ha 
+         ; extraído 
+         (exists (?te - tipoEdificio) 
+            (and (esTipoEdificio ?e ?te)
+               ; para todos los recursos, el edificio no necesita el recurso 
+               ; o lo necesita y se está extrayendo
+               (forall (?tr - tipoRecurso) 
+               ; Si el tipo de edificio necesita el material, se 
+               ; comprueba que se ha extraido 
+                  (or 
+                     (not (necesita ?te ?tr))
+                     (and (ha_extraido ?tr)
+                     (necesita ?te ?tr))
+                  )
+               )
+            )
+         )
+         ; Precondiciones redundantes 
+         (esTipoUnidad ?u VCE)  
+      )
    :effect 
       (and 
          ; Se asigna un edificio en esa localización 
          (en ?e ?l)
+         (edificioConstruido ?e)
       )
    )
-
 )
