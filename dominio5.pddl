@@ -5,7 +5,7 @@
    ; Para hacer lógica más avanzada 
    (:requirements :adl )
    (:types
-      posicionable localizacion - object
+      posicionable localizacion investigacion - object
       ; Unidad y edificio son clases y tipoEdificio y tipoRecurso
       ; son clases abstractas
       unidad edificio tipoUnidad tipoEdificio tipoRecurso - posicionable
@@ -16,7 +16,7 @@
       VCE - tipoUnidad
       Marine - tipoUnidad
       Soldado - tipoUnidad
-      Minerales Gas - tipoRecurso
+      Minerales Gas Especia - tipoRecurso
    )
    ; Molde para los predicados que definen el mundo 
    (:predicates
@@ -50,17 +50,40 @@
 
       ; Infica que una unidad ha sido reclutada
       (unidadReclutada ?u - unidad)
+
+      ; Indica que se ha realizado la investigación 
+      (investigado ?i - investigacion)
+
+      ; Indica los recursos necesarios para hacer una investigación 
+      (investigarNecesita ?i - investigacion ?tr - tipoRecurso)
    )
    
    (:action Investigar
    :parameters (?e - edificio ?i - investigacion)
    :precondition 
-      (and 
-      
+      (and
+         ; El edificio existe 
+         (edificioConstruido ?e)
+         ; El edificio es un laboratorio 
+         (esTipoEdificio ?e laboratorio)
+         ; La investigación no ha sido realizada ya  
+         (not (investigado ?i))
+         ; Es necesario tener los recursos necesarios por esa investigación 
+         ; para todos los recursos, la investigación no necesita el recurso 
+         ; o lo necesita y se está extrayendo
+         (forall (?tr - tipoRecurso) 
+         ; Si la investigacion necesita el material, se 
+         ; comprueba que se ha extraido 
+            (or 
+               (not (investigarNecesita ?i ?tr))
+               (and (ha_extraido ?tr)
+               (investigarNecesita ?i ?tr))
+            )
+         )
       )
    :effect 
       (and 
-      
+         (investigado ?i)
       )
    )
 
@@ -69,6 +92,11 @@
    :parameters (?e - edificio ?u - unidad ?l - localizacion)
    :precondition 
       (and
+         ; No se pueden reclutar Soldados hasta que se haya finalizado la investigación Spartan 
+         (imply 
+            (esTipoUnidad ?u Soldado)
+            (investigado Spartan)
+         )
          ; No puede estar reclutada ya  
          (not (unidadReclutada ?u))
          ; Tiene que existir el edificio en la localización
@@ -160,6 +188,11 @@
                (and (en ?e ?l) (esTipoEdificio ?e Extractor)
                )
             )
+         )
+         ; La Especia solo puede ser extraída por un VCE
+         (imply
+            (en Especia ?l)
+            (esTipoUnidad ?u VCE)
          )
       )
    :effect
